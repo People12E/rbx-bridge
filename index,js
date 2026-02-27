@@ -1,0 +1,27 @@
+const express = require("express");
+const app = express();
+
+app.use(express.text());
+
+let currentScript = "none";
+
+// Use a secret key so strangers can't hijack your executor
+const SECRET_KEY = "Your_Secret_Key_Here"; 
+
+app.post("/update", (req, res) => {
+    if (req.headers['auth'] === SECRET_KEY) {
+        currentScript = req.body;
+        console.log("Script updated!");
+        res.status(200).send("Updated");
+    } else {
+        res.status(403).send("Forbidden");
+    }
+});
+
+app.get("/get-script", (req, res) => {
+    res.send(currentScript);
+    // Roblox clears the script after fetching so it doesn't loop
+    currentScript = "none"; 
+});
+
+app.listen(process.env.PORT || 3000);
